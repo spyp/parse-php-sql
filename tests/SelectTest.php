@@ -90,6 +90,7 @@ class SelectTest extends PHPUnit_Framework_TestCase{
             array('joins1' => 'SELECT * from ps_table left join ps_table2 as sharif ON ps_table.id=sharif.id','expected' => array(array('table' => 'ps_table2','alias' => 'sharif'))),
             array('joins2' => 'SELECT * from ps_table left join ps_table2  sharif ON ps_table.id=sharif.id','expected' => array(array('table' => 'ps_table2','alias' => 'sharif'))),
             array('joins3' => 'SELECT * from ps_table left join ps_table2  ON ps_table.id=sharif.id','expected' => array(array('table' => 'ps_table2','alias' => ''))),
+            array('joins3' => 'SELECT * from ps_table left join ps_table2  ON ps_table.id=sharif.id RIGHT JOIN `ps_table3` fitish USING(id_order)','expected' => array(array('table' => 'ps_table2','alias' => ''),array('table'=>'ps_table3','alias'=>'fitish'))),
         );
     }
 }

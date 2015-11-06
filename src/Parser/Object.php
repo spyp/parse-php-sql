@@ -86,33 +86,79 @@ class Object{
      */
     public function joins()
     {
+
         $string = 'JOIN';
-        $positions = String::findPositions($this->sql,$string);
-        if(count($positions))
+        $positions = String::findPositions ($this->sql,$string);
+        if (count ($positions))
         {
             // check on join or more
-            if(count($positions)==1)
+            if (count ($positions)==1)
             {
                 // we have usually USING or ON in joins mysql so we get tables and alias of theme
-                $table = String::getBetween($this->sql,'JOIN','ON');
-                if(!$table)
-                    $table = String::getBetween($this->sql,'JOIN','USING');
-                if(!$table)
+                $table = String::getBetween ($this->sql,'JOIN','ON');
+                if (!$table)
+                {
+                    $table = String::getBetween ($this->sql,'JOIN','USING');
+                }
+                if (!$table)
+                {
                     return array();
-                $aliases = explode('AS',trim($table));
-                if(count($aliases)==1)
-                    // check with space
-                    $aliases = explode(' ',trim($table));
+                }
+                $aliases = $this->getAliases ($table);
+
                 return array(
-                    array('table'=>trim($aliases[0]),'alias'=>isset($aliases[1])?trim($aliases[1]):'')
+                    array('table' => trim (trim($aliases[0]),'`'),'alias' => isset($aliases[1]) ? trim (trim($aliases[1]),'`') : '')
                 );
             }
+            //several joins founded
             else
             {
+                $tables = array();
+                $index = 0;
+                foreach ($positions as $key=>$position)
+                {
+                    $index++;
+                    $next_position = String::findPositions ($this->sql,'ON',$position,false);
+                    if (!count ($next_position))
+                    {
+                        $next_position = String::findPositions ($this->sql,'USING',$position,false);
+                    }
+                    if (!count ($next_position))
+                    {
+                        continue;
+                    }
+                    else
+                    {
 
+                        $next_position = $next_position[0];
+                        if(isset($positions[$index]) && $next_position>$positions[$index])
+                            continue;
+                        $length = $next_position - $position;
+                        $table = substr ($this->sql,$position + strlen ('JOIN'),$length-strlen('JOIN'));
+                        $aliases = $this->getAliases ($table);
+                        $tables[] =  array('table' => trim (trim($aliases[0]),'`'),'alias' => isset($aliases[1]) ? trim (trim($aliases[1]),'`') : '');
+                    }
+                }
+                return $tables;
             }
         }
         else
+        {
             return array();
+        }
+    }
+
+    // get aliases
+    protected function getAliases($table)
+    {
+
+        $aliases = explode ('AS',trim ($table));
+        if (count ($aliases)==1)
+            // check with space
+        {
+            $aliases = explode (' ',trim ($table));
+        }
+
+        return $aliases;
     }
 }

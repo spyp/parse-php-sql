@@ -15,8 +15,8 @@ class String{
      * @param $string    string
      * @param $first     ,first position of string
      * @param $last      ,last position of string
-     * @param $get_first , get first chars in string
-     * @param $get_last  , get last chars in string
+     * @param $get_first , contains first chars in string
+     * @param $get_last  , contains last chars in string
      *
      * @return string
      */
@@ -64,17 +64,20 @@ class String{
      * find all position of needle string in string
      * @param  $string
      * @param $needle
-     * @return array
+     * @param $lastPos, last position to start finding
+     * @param $getAll,bool getAll position of needle string or just first position
+     * @return array,position of needle string
      */
-    public static function findPositions($string,$needle)
+    public static function findPositions($string,$needle,$lastPos=0,$getAll=true)
     {
-        $lastPos = 0;
         $positions = array();
 
         while (($lastPos = strpos($string, $needle, $lastPos))!== false)
         {
             $positions[] = $lastPos;
             $lastPos = $lastPos + strlen($needle);
+            if(!$getAll)
+                return $positions;
         }
         return $positions;
 
